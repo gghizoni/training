@@ -1,0 +1,9 @@
+# Bancos de dados locais (dados pessoais de treino)
+*.db
+*.db-journal
+# Python
+__pycache__/
+*.py[cod]
+# Ambientes virtuais
+.venv/
+venv/
