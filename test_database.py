@@ -15,6 +15,19 @@ from database import (
 from models import Exercicio, TreinoDiario
 def _now_iso(days_ago=0):
     return (datetime.now() - timedelta(days=days_ago)).isoformat()
+
+
+def _exercise_ids(db_path):
+    connection = sqlite3.connect(db_path)
+    try:
+        return [
+            row[0]
+            for row in connection.execute("SELECT id FROM exercicios")
+        ]
+    finally:
+        connection.close()
+
+
 class DatabaseTestCase(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
@@ -42,9 +55,9 @@ class RoundTripTests(DatabaseTestCase):
         self.assertEqual(carregados[1].exercicios[0].series, 3)
     def test_unchanged_exercises_are_not_rewritten(self):
         save_all_treinos(self._treinos(1))
-        ids_antes = [r[0] for r in sqlite3.connect(self.db_path).execute("SELECT id FROM exercicios")]
+        ids_antes = _exercise_ids(self.db_path)
         save_all_treinos(load_all_treinos())
-        ids_depois = [r[0] for r in sqlite3.connect(self.db_path).execute("SELECT id FROM exercicios")]
+        ids_depois = _exercise_ids(self.db_path)
         self.assertEqual(ids_antes, ids_depois)
     def test_empty_save_and_load(self):
         save_all_treinos([])
